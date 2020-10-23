@@ -37,31 +37,37 @@ function create() {
 };
 
 function update() {
-  for (var i = 0; i < boidsNum; i++) {
-    bound(i);
+  for (var boid of boids) {
+    bound(boid);
 
     // apply movement
-    boids[i].x += boids[i].body.velocity.x * boids[i].speed;
-    boids[i].y += boids[i].body.velocity.y * boids[i].speed;
+    boid.x += boid.body.velocity.x * boid.speed;
+    boid.y += boid.body.velocity.y * boid.speed;
 
     //turn in the right direction
-    var angleRad = Phaser.Math.Angle.Between(0, 0, boids[i].body.velocity.x, boids[i].body.velocity.y);
-    boids[i].setAngle(Phaser.Math.RadToDeg(angleRad));
+    boid.setAngle(computeAngle(boid.body.velocity));
   }
 };
 
-function bound(i) {
+function bound(boid) {
   var limit = 10;
-  if (boids[i].x < limit) {
-    boids[i].body.velocity.x = Math.abs(boids[i].body.velocity.x);
+  if (boid.x < limit) {
+    boid.body.velocity.x = Math.abs(boid.body.velocity.x);
   }
-  else if (boids[i].x > window.innerWidth - limit) {
-    boids[i].body.velocity.x = -1 * Math.abs(boids[i].body.velocity.x);
+  else if (boid.x > window.innerWidth - limit) {
+    boid.body.velocity.x = -1 * Math.abs(boid.body.velocity.x);
   }
-  if (boids[i].y < limit) {
-    boids[i].body.velocity.y = Math.abs(boids[i].body.velocity.y);
+  if (boid.y < limit) {
+    boid.body.velocity.y = Math.abs(boid.body.velocity.y);
   }
-  else if (boids[i].y > window.innerHeight- limit) {
-    boids[i].body.velocity.y = -1 *Math.abs(boids[i].body.velocity.y);
+  else if (boid.y > window.innerHeight- limit) {
+    boid.body.velocity.y = -1 *Math.abs(boid.body.velocity.y);
   }
 };
+
+function computeAngle(velocity) {
+  var zeroPoint = new Phaser.Geom.Point(0, 0);
+  var angleRad = Phaser.Math.Angle.BetweenPoints(zeroPoint, velocity);
+  return Phaser.Math.RadToDeg(angleRad);
+};
+
