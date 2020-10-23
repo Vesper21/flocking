@@ -39,6 +39,13 @@ function create() {
 function update() {
   for (var boid of boids) {
     bound(boid);
+    //compute velocity
+    var f1 = attraction(boid, boids);
+
+    var newVelocity = new Phaser.Math.Vector2(boid.body.velocity.x + f1.x, boid.body.velocity.y + f1.y);
+    newVelocity.normalize();
+    boid.setVelocity(newVelocity.x, newVelocity.y);
+
 
     // apply movement
     boid.x += boid.body.velocity.x * boid.speed;
@@ -69,5 +76,24 @@ function computeAngle(velocity) {
   var zeroPoint = new Phaser.Geom.Point(0, 0);
   var angleRad = Phaser.Math.Angle.BetweenPoints(zeroPoint, velocity);
   return Phaser.Math.RadToDeg(angleRad);
+};
+
+function attraction(boid, boids) {
+  var closeBoids = [];
+  var radius = 100;
+  for (var otherBoid of boids) {
+    var distance = Phaser.Math.Distance.BetweenPoints(otherBoid, boid);
+    if (distance < radius) {
+      closeBoids.push(otherBoid)
+    }
+  }
+  if (closeBoids.length > 0) {
+    var centroid = Phaser.Geom.Point.GetCentroid(closeBoids);
+  }
+  else {
+    return new Phaser.Math.Vector2(0, 0);
+  }
+  var force = new Phaser.Math.Vector2(centroid.x - boid.x, centroid.y - boid.y)
+  return force.normalize()
 };
 
