@@ -109,7 +109,7 @@ flocking.prototype = {
 			for (var j=0; j < boidsNum; j++) {
 				if (j !== boidId && boids[boidId].position.distance(boids[j].position) < 15) {
 					var sub = Phaser.Point.subtract(boids[j].position, boids[boidId].position);
-				 	epulsion.subtract(sub.x, sub.y);
+				 	repulsion.subtract(sub.x, sub.y);
 				}
 			}
 			return repulsion;
