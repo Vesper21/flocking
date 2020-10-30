@@ -41,8 +41,9 @@ function update() {
     bound(boid);
     //compute velocity
     var f1 = attraction(boid, boids);
+    var f2 = repulsion(boid, boids);
 
-    var newVelocity = new Phaser.Math.Vector2(boid.body.velocity.x + f1.x, boid.body.velocity.y + f1.y);
+    var newVelocity = new Phaser.Math.Vector2(boid.body.velocity.x + f1.x + f2.x, boid.body.velocity.y + f1.y + f2.y);
     newVelocity.normalize();
     boid.setVelocity(newVelocity.x, newVelocity.y);
 
@@ -83,17 +84,31 @@ function attraction(boid, boids) {
   var radius = 100;
   for (var otherBoid of boids) {
     var distance = Phaser.Math.Distance.BetweenPoints(otherBoid, boid);
-    if (distance < radius) {
+    if (distance < radius && distance != 0) { // TODO remove self
       closeBoids.push(otherBoid)
     }
   }
-  if (closeBoids.length > 0) {
-    var centroid = Phaser.Geom.Point.GetCentroid(closeBoids);
-  }
-  else {
+  if (closeBoids.length == 0) {
     return new Phaser.Math.Vector2(0, 0);
   }
+  var centroid = Phaser.Geom.Point.GetCentroid(closeBoids);
   var force = new Phaser.Math.Vector2(centroid.x - boid.x, centroid.y - boid.y)
   return force.normalize()
 };
 
+function repulsion(boid, boids) {
+  var tooCloseBoids = []
+  var radius = 15;
+  for (var otherBoid of boids) {
+    var distance = Phaser.Math.Distance.BetweenPoints(otherBoid, boid);
+    if (distance < radius && distance != 0) {
+      tooCloseBoids.push(otherBoid)
+    }
+  }
+  if (tooCloseBoids.length == 0) {
+    return new Phaser.Math.Vector2(0, 0);
+  }
+  var centroid = Phaser.Geom.Point.GetCentroid(tooCloseBoids);
+  var force = new Phaser.Math.Vector2(boid.x - centroid.x, boid.y - centroid.y)
+  return force.normalize()
+ };
